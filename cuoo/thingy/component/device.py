@@ -19,6 +19,7 @@ class Device(Component):
         self.registered_actuators: List['Actuator']
         self.registered_sensors: List['Sensor']
 
+    # TODO: Fix type inheritance issue
     def register_actuator(self, actuator: Type['Actuator']) -> 'Actuator':
         return self.context.extend(actuator).element
 
