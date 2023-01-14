@@ -68,10 +68,9 @@ class Engine(Services):
         props = {
             'port': 2866
         }
-        if os.environ.get('HOST_PORT', False):
-            props['port'] = os.environ.get('HOST_PORT', 2866)
+        props['port'] = os.environ.get('HOST_PORT') or 2866
 
-        if int(os.environ.get('SSL_ENABLED', False)) != 0:
+        if int(os.environ.get('SSL_ENABLED')) != 0:
             import ssl
             props['ssl_context'] = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             props['ssl_context'].load_cert_chain(

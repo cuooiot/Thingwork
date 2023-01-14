@@ -22,7 +22,7 @@ class Services:
         # Storage stuff
         self.__app = web.Application(middlewares=middleware)
         self.__redis = redis.Redis(
-            host=os.environ.get('REDIS_HOST', 'localhost'),
+            host=os.environ.get('REDIS_HOST', 'redis'),
             port=os.environ.get('REDIS_PORT', 6379),
             db=os.environ.get('REDIS_DB', 0),
         )

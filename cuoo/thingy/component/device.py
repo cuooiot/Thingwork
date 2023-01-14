@@ -19,12 +19,15 @@ class Device(Component):
         self.registered_actuators: List['Actuator']
         self.registered_sensors: List['Sensor']
 
-    def ignite(self) -> List:
-        def _(component: Type[Union['Actuator', 'Sensor']]) -> Union['Actuator', 'Sensor']:
-            return self.context.extend(component).element
+    def register_actuator(self, actuator: Type['Actuator']) -> 'Actuator':
+        return self.context.extend(actuator).element
 
-        self.registered_actuators: List['Actuator'] = list(map(_, self.__class__.actuators))
-        self.registered_sensors: List['Sensor'] = list(map(_, self.__class__.sensors))
+    def register_sensor(self, actuator: Type['Sensor']) -> 'Sensor':
+        return self.context.extend(actuator).element
+
+    def ignite(self) -> List:
+        self.registered_actuators: List['Actuator'] = list(map(self.register_actuator, self.__class__.actuators))
+        self.registered_sensors: List['Sensor'] = list(map(self.register_sensor, self.__class__.sensors))
 
         def _(component: Union['Device', 'Actuator', 'Sensor']):
             return asyncio.create_task(component.create())
