@@ -16,19 +16,23 @@ class Device(Component):
 
     def __init__(self, broker: 'Broker', context: 'Context'):
         super().__init__(broker, context)
-        self.registered_actuators: List['Actuator']
-        self.registered_sensors: List['Sensor']
+        self.registered_actuators: List['Actuator'] = []
+        self.registered_sensors: List['Sensor'] = []
 
     # TODO: Fix type inheritance issue
     def register_actuator(self, actuator: Type['Actuator']) -> 'Actuator':
-        return self.context.extend(actuator).element
+        actuator: Actuator = self.context.extend(actuator).element
+        self.registered_actuators.append(actuator)
+        return actuator
 
-    def register_sensor(self, actuator: Type['Sensor']) -> 'Sensor':
-        return self.context.extend(actuator).element
+    def register_sensor(self, sensor: Type['Sensor']) -> 'Sensor':
+        sensor: Sensor = self.context.extend(sensor).element
+        self.registered_sensors.append(sensor)
+        return sensor
 
     def ignite(self) -> List:
-        self.registered_actuators: List['Actuator'] = list(map(self.register_actuator, self.__class__.actuators))
-        self.registered_sensors: List['Sensor'] = list(map(self.register_sensor, self.__class__.sensors))
+        map(self.register_actuator, self.__class__.actuators)
+        map(self.register_sensor, self.__class__.sensors)
 
         def _(component: Union['Device', 'Actuator', 'Sensor']):
             return asyncio.create_task(component.create())
