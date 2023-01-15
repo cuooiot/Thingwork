@@ -40,5 +40,4 @@ class Broker:
         )
 
     def extinguish(self):
-        print('ext')
         map(lambda device: device.extinguish(), self.registered_devices)

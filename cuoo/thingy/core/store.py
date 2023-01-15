@@ -14,11 +14,11 @@ class Store:
     def __init__(self, engine: 'Engine'):
         self.engine = engine
 
-    def reset(self, include_modified=True):
-        # List of all the accesses this loop
+        # TODO: Confirm efficiency of keeping track of access in a list
         self.accessed_keys: List[str] = []
         self.accessed_objs: List['Component'] = []
 
+    def reset(self, include_modified=True):
         self.current_accessor: Optional['Component'] = None
         self.current_device: Optional['Device'] = None
 
@@ -37,7 +37,7 @@ class Store:
                     await asyncio.sleep(1)
 
         try:
-            await asyncio.wait_for(_(), timeout=5)  # TODO: Make master
+            await asyncio.wait_for(_(), timeout=5)  # TODO: Make a constant / configurable
             self.reset()
 
             for device in self.engine.broker.registered_devices:
@@ -49,7 +49,7 @@ class Store:
                 for sensor in device.registered_sensors:
                     sensor.tick()
         except asyncio.TimeoutError:
-            print('Devices never became ready')
+            print('Devices never became ready') # TODO: Create an actual exception rather
             sys.exit()
 
         while True:
@@ -58,7 +58,8 @@ class Store:
                 await asyncio.sleep(0)
             except Exception as e:
                 self.reset()
-                print(e, file=sys.stderr)
+                import traceback # TODO: Nake this optional in production
+                traceback.print_exception(e, file=sys.stderr)
                 raise e
 
     async def tick(self):
@@ -68,6 +69,9 @@ class Store:
             await self.tick_resolved()
 
     async def tick_dirty(self):
+        # If this loop resolved, we need to move onto the next step, so this is our marker
+        self.is_resolved = True
+
         stack: List['Component'] = []
         for index, key in enumerate(self.accessed_keys):
             if key in self.modified_keys:
@@ -75,14 +79,27 @@ class Store:
                 if accessor not in stack:
                     stack.append(accessor)
 
-        self.reset(include_modified=False)
+        self.reset()
 
+        # Now we have a list of dependencies that we need to reload, Do it
         for accessor in stack:
+            # First remove the existing accesses that a device / component may have made
+            indexes = []
+            for index, obj in enumerate(self.accessed_objs):
+                if obj == accessor:
+                    indexes.append(index)
+
+            # Do the removing
+            indexes.sort(reverse=True)
+            for index in indexes:
+                self.accessed_keys.pop(index)
+                self.accessed_objs.pop(index)
+
+            # Now re-fire it for its side effects
             accessor.tick()
 
-        self.is_resolved = True
-
     async def tick_resolved(self, client=None):
+        # TODO: Split into a separate module?
         to_emit = self.engine.redis.pipeline()
         if client is not None:
             to_emit.json().get('registered_clients', f"$[?(@.id == '{client}')]")
@@ -152,7 +169,7 @@ class Store:
             parts = []
             for fragment in key.split('.'):
                 parts.append(fragment)
-                self.accessed_keys.append(f'{self.namespace}:{".".join(parts)}')
+                self.accessed_keys.append(f'{self.namespace}:$.{".".join(parts)}')
                 self.accessed_objs.append(self.current_accessor)
 
         # Data accessor
@@ -182,12 +199,13 @@ class Store:
         if (was != value):
             self.is_dirty = True
 
-            parts = []
-            for fragment in key.split('.'):
-                parts.append(fragment)
-                path = ".".join(parts)
-                self.accessed_keys.append(f'{self.namespace}:{path}')
-                self.accessed_objs.append(self.current_accessor)
+            # TODO: Maybe a set action should not count as an access?
+            # parts = []
+            # for fragment in key.split('.'):
+            #     parts.append(fragment)
+            #     path = ".".join(parts)
+            #     self.accessed_keys.append(f'{self.namespace}:{path}')
+            #     self.accessed_objs.append(self.current_accessor)
 
             parts = []
             for fragment in ('$.' + key).split('.'):

@@ -10,12 +10,10 @@ if TYPE_CHECKING:
 class Web:
     from .controllers.devices import Devices
     from .controllers.clients import Clients
-    from .controllers.something import Something
 
     controllers: List[Type['Controller']] = [
         Devices,
         Clients,
-        Something
     ]
 
     def __init__(self, engine: 'Engine'):
