@@ -3,46 +3,48 @@ import asyncio
 import os
 
 import aiohttp.web as aiohttp_web
-from typing import TYPE_CHECKING, Type, List, Union
+from typing import TYPE_CHECKING, Type, List
 
-from .services import Services
+from .container import Container
+from .service import Service
+from .store import Store
+from ..events import Events
 
 if TYPE_CHECKING:
     from aiohttp.web import _Middleware
-    from ..component.broker import Broker
-    from ..web import Web
     from .context import Context
 
 
-class Engine(Services):
+class Engine(Container):
     registered_contexts: List['Context'] = []
     middleware: List['_Middleware'] = []
 
-    def attach(self, service: Type[Union['Broker', 'Web']]):
-        from ..component.broker import Broker
-        from ..web import Web
+    def __init__(self):
+        super().__init__()
+        self.attach(Store)
+        self.attach(Events)
 
+    def attach(self, service: Type['Service']):
         service = service(self)
-        if isinstance(service, Broker):
-            self.__broker = service
-        elif isinstance(service, Web):
-            self.__web = service
-
-    @property
-    def broker(self):
-        return self.__broker
-
-    @property
-    def web(self):
-        return self.__web
+        self.services[service.__class__.__name__.lower()] = service
 
     def register_context(self, context: 'Context'):
         self.registered_contexts.append(context)
 
     def ignite(self):
+        self.ignite_events()
         self.ignite_devices()
         self.ignite_reactor()
         self.ignite_web()
+
+    def ignite_events(self):
+        async def _(_):
+            task = asyncio.create_task(self.events.ignite())
+            yield
+            task.cancel()
+            await task
+
+        self.app.cleanup_ctx.append(_)
 
     def ignite_devices(self):
         async def _(_):

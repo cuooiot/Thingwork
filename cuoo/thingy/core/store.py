@@ -4,13 +4,15 @@ from typing import TYPE_CHECKING, List, Optional
 
 import aiohttp
 
+from .service import Service
+
 if TYPE_CHECKING:
     from .engine import Engine
     from ..component import Component
     from ..component.device import Device
 
 
-class Store:
+class Store(Service):
     def __init__(self, engine: 'Engine'):
         self.engine = engine
 

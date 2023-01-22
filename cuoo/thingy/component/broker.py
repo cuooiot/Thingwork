@@ -3,13 +3,14 @@ import functools
 from typing import TYPE_CHECKING, List, Type
 
 from ..core.context import Context
+from ..core.service import Service
 
 if TYPE_CHECKING:
     from .device import Device
     from ..core.engine import Engine
 
 
-class Broker:
+class Broker(Service):
     devices: List[Type['Device']]
 
     def __init__(self, engine: 'Engine'):

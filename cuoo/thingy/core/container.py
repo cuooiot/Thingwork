@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+import abc
+from typing import TYPE_CHECKING, Dict
 
 import os
 
@@ -12,7 +13,9 @@ if TYPE_CHECKING:
     from aiohttp.web import Application
 
 
-class Services:
+class Container:
+    services: Dict[str] = {}
+
     def __init__(self):
         from ..web.middleware.authentication import Authentiction
         middleware = \
@@ -20,27 +23,38 @@ class Services:
                 Authentiction.handle
             ] + (self.middleware or []) + []
         # Storage stuff
-        self.__app = web.Application(middlewares=middleware)
-        self.__redis = redis.Redis(
+        self.services['app'] = web.Application(middlewares=middleware)
+        self.services['redis'] = redis.Redis(
             host=os.environ.get('REDIS_HOST', 'redis'),
             port=os.environ.get('REDIS_PORT', 6379),
             db=os.environ.get('REDIS_DB', 0),
         )
-        self.__store = Store(self)
 
     # Services
     @property
     def app(self) -> 'Application':
-        return self.__app
+        return self.services['app']
 
     @property
     def store(self) -> 'Store':
-        return self.__store
+        return self.services['store']
 
     @property
     def redis(self) -> redis.Redis:
-        return self.__redis
+        return self.services['redis']
 
     @property
     def r_json(self) -> 'JSON':
-        return self.__redis.json()
+        return self.redis.json()
+
+    @property
+    def broker(self):
+        return self.services['broker']
+
+    @property
+    def web(self):
+        return self.services['web']
+
+    @property
+    def events(self):
+        return self.services['events']

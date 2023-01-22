@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Type, List
 
+from ..core.service import Service
+
 if TYPE_CHECKING:
     from ..core.engine import Engine
     from ..web.controllers import Controller
@@ -7,7 +9,7 @@ if TYPE_CHECKING:
     from aiohttp.web_routedef import RouteDef
 
 
-class Web:
+class Web(Service):
     from .controllers.devices import Devices
     from .controllers.clients import Clients
 
