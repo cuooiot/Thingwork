@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class Container:
-    services: Dict[str] = {}
+    services: Dict[str, object] = {}
 
     def __init__(self):
         from ..web.middleware.authentication import Authentiction
