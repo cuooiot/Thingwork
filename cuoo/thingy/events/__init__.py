@@ -2,14 +2,14 @@ import asyncio
 from typing import TYPE_CHECKING, List
 
 from ..core.service import Service
+from ..events.event import Event
 
 if TYPE_CHECKING:
     from ..core.engine import Engine
-    from ..events.event import Event
 
 
 class Events(Service):
-    events: List['Event']
+    events: List['Event'] = []
 
     def __init__(self, engine: 'Engine'):
         self.engine = engine
@@ -38,5 +38,5 @@ class Events(Service):
 
     def process_tick(self):
         for event in self.events:
-            if (not event.is_registered):
-                event.register()
+            if (event.is_registered):
+                event.tick()
