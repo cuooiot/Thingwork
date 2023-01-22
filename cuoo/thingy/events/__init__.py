@@ -18,7 +18,7 @@ class Events(Service):
         while True:
             self.process_removals()
             self.process_new()
-            await asyncio.sleep(1)
+            await asyncio.sleep(1) # TODO: Change to a constant: EVENT_LOOP_FREQUENCY
             self.process_tick()
 
     def new(self, callback, time):

@@ -31,8 +31,10 @@ class Device(Component):
         return sensor
 
     def ignite(self) -> List:
-        map(self.register_actuator, self.__class__.actuators)
-        map(self.register_sensor, self.__class__.sensors)
+        for actuator in self.__class__.actuators:
+            self.register_actuator(actuator)
+        for sensor in self.__class__.sensors:
+            self.register_sensor(sensor)
 
         def _(component: Union['Device', 'Actuator', 'Sensor']):
             return asyncio.create_task(component.create())
