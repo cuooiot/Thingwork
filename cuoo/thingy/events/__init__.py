@@ -22,6 +22,8 @@ class Events(Service):
                 await asyncio.sleep(1)
                 self.process_tick()
 
+        return _
+
     def new(self, callback, time):
         event = Event(callback, time)
         self.events.append(event)
