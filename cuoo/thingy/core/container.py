@@ -10,7 +10,7 @@ from .store import Store
 if TYPE_CHECKING:
     from redis.commands.json import JSON
     from aiohttp.web import Application
-    from cuoo.thingy.events import Events
+    from ..events import Events
 
 
 class Container:

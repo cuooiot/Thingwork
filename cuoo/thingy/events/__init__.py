@@ -1,9 +1,9 @@
 import asyncio
 from typing import List
 
-from cuoo.thingy.core.engine import Engine
-from cuoo.thingy.core.service import Service
-from cuoo.thingy.events.event import Event
+from ..core.engine import Engine
+from ..core.service import Service
+from ..events.event import Event
 
 
 class Events(Service):
