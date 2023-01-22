@@ -1,9 +1,11 @@
 import asyncio
-from typing import List
+from typing import TYPE_CHECKING, List
 
-from ..core.engine import Engine
 from ..core.service import Service
-from ..events.event import Event
+
+if TYPE_CHECKING:
+    from ..core.engine import Engine
+    from ..events.event import Event
 
 
 class Events(Service):
