@@ -14,15 +14,12 @@ class Events(Service):
     def __init__(self, engine: 'Engine'):
         self.engine = engine
 
-    def ignite(self):
-        async def _():
-            while True:
-                self.process_removals()
-                self.process_new()
-                await asyncio.sleep(1)
-                self.process_tick()
-
-        return _
+    async def ignite(self):
+        while True:
+            self.process_removals()
+            self.process_new()
+            await asyncio.sleep(1)
+            self.process_tick()
 
     def new(self, callback, time):
         event = Event(callback, time)
