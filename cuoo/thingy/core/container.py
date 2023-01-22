@@ -1,4 +1,3 @@
-import abc
 from typing import TYPE_CHECKING, Dict
 
 import os
@@ -11,6 +10,7 @@ from .store import Store
 if TYPE_CHECKING:
     from redis.commands.json import JSON
     from aiohttp.web import Application
+    from ..events import Events
 
 
 class Container:
@@ -56,5 +56,5 @@ class Container:
         return self.services['web']
 
     @property
-    def events(self):
+    def events(self) -> 'Events':
         return self.services['events']

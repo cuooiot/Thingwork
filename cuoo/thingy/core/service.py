@@ -1,6 +1,8 @@
 import abc
+from typing import TYPE_CHECKING
 
-from cuoo.thingy.core.engine import Engine
+if TYPE_CHECKING:
+    from cuoo.thingy.core.engine import Engine
 
 
 class Service:
