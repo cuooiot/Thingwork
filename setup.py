@@ -7,7 +7,7 @@ setup(
     author='Bugbird Co.',
     author_email='hey@cuoo.io',
     url='https://l.cuoo.io/thingwork',
-    packages=['cuoo.thingy.core', 'cuoo.thingy.component', 'cuoo.thingy.web', 'cuoo.thingy.web.controllers',
+    packages=['cuoo.thingy.core', 'cuoo.thingy.events', 'cuoo.thingy.component', 'cuoo.thingy.web', 'cuoo.thingy.web.controllers',
               'cuoo.thingy.web.middleware'],
     install_requires=[
         'aiohttp',
