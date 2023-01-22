@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Type, List
 from .container import Container
 from .service import Service
 from .store import Store
-from ..events import Events
+from cuoo.thingy.events import Events
 
 if TYPE_CHECKING:
     from aiohttp.web import _Middleware
